@@ -18,6 +18,10 @@ COPY . .
 # Disable telemetry for Next.js build
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Set dummy environment variables so the build doesn't fail on DB connection checks
+ENV DATABASE_PATH=":memory:"
+ENV SETTINGS_DATABASE_PATH=":memory:"
+
 RUN npm run build
 
 # Production image, copy all the files and run next
