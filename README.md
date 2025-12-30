@@ -7,15 +7,15 @@ A comprehensive dashboard for managing TaskerBot, featuring Discord authenticati
 *   **Discord Authentication**: Secure login using NextAuth.js with Discord provider.
 *   **Objective Tracking**: Create, view, and manage daily/weekly/monthly objectives.
 *   **Proof Feed**: Submit photo proofs for objectives (stored locally in browser via IndexedDB).
-*   **Dynamic Settings**: Configure bot settings (e.g., Message Visibility) which are stored in a server-side SQLite database.
+*   **Dynamic Settings**: Configure bot settings (e.g., Message Visibility) which are stored in a cloud-hosted Turso database.
 *   **Dark Mode**: Fully styled with a Discord-inspired dark theme.
-*   **Docker Ready**: Includes Dockerfile and configuration for easy containerized deployment.
+*   **Deployment Ready**: Optimized for Vercel deployment.
 
 ## Prerequisites
 
 *   Node.js 20+ (for local development)
-*   Docker & Docker Compose (for deployment)
 *   A Discord Application (for OAuth)
+*   A Turso Database account
 
 ## Local Development
 
@@ -41,9 +41,9 @@ A comprehensive dashboard for managing TaskerBot, featuring Discord authenticati
     NEXTAUTH_SECRET=your_random_secret_string
     NEXTAUTH_URL=http://localhost:3000
     
-    # Database Paths (Absolute paths for local dev)
-    DATABASE_PATH=C:/path/to/your/objectives.db
-    SETTINGS_DATABASE_PATH=C:/path/to/your/settings.db
+    # Turso Database
+    TURSO_DATABASE_URL=libsql://your-db-name.turso.io
+    TURSO_AUTH_TOKEN=your-turso-auth-token
     ```
 
 4.  **Run the development server:**
@@ -54,54 +54,27 @@ A comprehensive dashboard for managing TaskerBot, featuring Discord authenticati
 5.  **Open the dashboard:**
     Visit [http://localhost:3000](http://localhost:3000).
 
-## Docker Deployment
+## Deployment (Vercel)
 
-The project is configured for production deployment using Docker.
+This project is optimized for deployment on Vercel.
 
-### 1. Build the Image
-```bash
-docker build -t rsomonte/taskerbot-dashboard .
-```
-
-### 2. Run with Docker Compose
-Add the dashboard service to your `docker-compose.yml`. Ensure it shares the data volume with your bot container so they can access the same SQLite databases.
-
-```yaml
-services:
-  dashboard:
-    image: rsomonte/taskerbot-dashboard:latest
-    container_name: taskerbot_dashboard
-    restart: unless-stopped
-    volumes:
-      # Mount the host data folder to /app/data inside the container
-      - ./data:/app/data
-    environment:
-      - DATABASE_PATH=/app/data/objectives.db
-      - SETTINGS_DATABASE_PATH=/app/data/settings.db
-      - NEXTAUTH_URL=https://dashboard.yourdomain.com
-      - NEXTAUTH_SECRET=your_secret
-      - DISCORD_CLIENT_ID=your_id
-      - DISCORD_CLIENT_SECRET=your_secret
-    networks:
-      - default
-```
-
-### 3. Reverse Proxy (Caddy)
-If using Caddy, you can serve the dashboard on a subdomain:
-
-```caddy
-dashboard.yourdomain.com {
-    reverse_proxy taskerbot_dashboard:3000
-}
-```
+1.  **Push to GitHub**: Ensure your code is pushed to a GitHub repository.
+2.  **Import to Vercel**: Create a new project in Vercel and import your repository.
+3.  **Environment Variables**: Add the following variables in the Vercel Project Settings:
+    *   `DISCORD_CLIENT_ID`
+    *   `DISCORD_CLIENT_SECRET`
+    *   `NEXTAUTH_SECRET`
+    *   `NEXTAUTH_URL` (Set to your Vercel domain, e.g., `https://your-project.vercel.app`)
+    *   `TURSO_DATABASE_URL`
+    *   `TURSO_AUTH_TOKEN`
+4.  **Discord Redirects**: Go to the Discord Developer Portal -> OAuth2 -> Redirects and add:
+    `https://your-project.vercel.app/api/auth/callback/discord`
 
 ## Project Structure
 
 *   `src/app`: Next.js App Router pages and API routes.
 *   `src/components`: React components (SettingsForm, Feed, etc.).
-*   `src/lib`: Utility functions and database connections (`db.ts`, `settingsDb.ts`).
-*   `objectives.db`: SQLite database for user objectives.
-*   `settings.db`: SQLite database for dynamic bot settings.
+*   `src/lib`: Utility functions and database connections (`db.ts`).
 
 ## Tech Stack
 
@@ -109,5 +82,5 @@ dashboard.yourdomain.com {
 *   **Language**: TypeScript
 *   **Styling**: Tailwind CSS
 *   **Auth**: NextAuth.js
-*   **Database**: better-sqlite3 (Server), idb (Client-side)
-*   **Deployment**: Docker
+*   **Database**: Turso (@libsql/client)
+*   **Deployment**: Vercel
