@@ -19,8 +19,8 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Set dummy environment variables so the build doesn't fail on DB connection checks
-ENV DATABASE_PATH=":memory:"
-ENV SETTINGS_DATABASE_PATH=":memory:"
+ENV TURSO_DATABASE_URL="libsql://dummy-db.turso.io"
+ENV TURSO_AUTH_TOKEN="dummy-token"
 
 RUN npm run build
 
