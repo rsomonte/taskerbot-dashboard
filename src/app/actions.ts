@@ -2,8 +2,7 @@
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { createObjective, deleteObjective, renameObjective, getObjective, updateObjective } from "@/lib/db";
-import { setUserSetting } from "@/lib/settingsDb";
+import { createObjective, deleteObjective, renameObjective, getObjective, updateObjective, setUserSetting } from "@/lib/db";
 import { getNextAllowedTime } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
@@ -14,7 +13,7 @@ export async function updateSetting(key: string, value: string) {
     throw new Error("Unauthorized");
   }
 
-  setUserSetting(session.user.id, key, value);
+  await setUserSetting(session.user.id, key, value);
   revalidatePath("/settings");
 }
 
@@ -22,11 +21,11 @@ export async function createNewObjective(name: string, frequency: 'daily' | 'wee
   const session = await getServerSession(authOptions);
   if (!session?.user) throw new Error("Unauthorized");
 
-  if (getObjective(session.user.id, name)) {
+  if (await getObjective(session.user.id, name)) {
     throw new Error("Objective already exists");
   }
 
-  createObjective({
+  await createObjective({
     userId: session.user.id,
     name,
     frequency
@@ -39,7 +38,7 @@ export async function deleteObjectives(names: string[]) {
   if (!session?.user) throw new Error("Unauthorized");
 
   for (const name of names) {
-    deleteObjective(session.user.id, name);
+    await deleteObjective(session.user.id, name);
   }
   revalidatePath("/");
 }
@@ -48,11 +47,11 @@ export async function renameUserObjective(currentName: string, newName: string) 
   const session = await getServerSession(authOptions);
   if (!session?.user) throw new Error("Unauthorized");
 
-  if (getObjective(session.user.id, newName)) {
+  if (await getObjective(session.user.id, newName)) {
     throw new Error("Objective with new name already exists");
   }
 
-  renameObjective(session.user.id, currentName, newName);
+  await renameObjective(session.user.id, currentName, newName);
   revalidatePath("/");
 }
 
@@ -60,7 +59,7 @@ export async function submitUserObjective(name: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user) throw new Error("Unauthorized");
 
-  const obj = getObjective(session.user.id, name);
+  const obj = await getObjective(session.user.id, name);
   if (!obj) throw new Error("Objective not found");
 
   const now = Date.now();
@@ -100,6 +99,6 @@ export async function submitUserObjective(name: string) {
   
   obj.lastStreakDay = today.toISOString().split('T')[0]; // Store as YYYY-MM-DD
 
-  updateObjective(obj);
+  await updateObjective(obj);
   revalidatePath("/");
 }

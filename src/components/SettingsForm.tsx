@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateSetting } from "@/app/actions";
-import { SettingDefinition } from "@/lib/settingsDb";
+import { SettingDefinition } from "@/lib/db";
 
 interface SettingsFormProps {
   definitions: SettingDefinition[];

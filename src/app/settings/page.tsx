@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
-import { getSettingDefinitions, getUserSettings } from "@/lib/settingsDb";
+import { getSettingDefinitions, getUserSettings } from "@/lib/db";
 import SettingsForm from "@/components/SettingsForm";
 import { redirect } from "next/navigation";
 
@@ -11,8 +11,8 @@ export default async function Settings() {
     redirect("/");
   }
 
-  const definitions = getSettingDefinitions();
-  const userSettings = getUserSettings(session.user.id);
+  const definitions = await getSettingDefinitions();
+  const userSettings = await getUserSettings(session.user.id);
 
   return (
     <div className="flex min-h-screen flex-col items-center p-8 sm:p-24">

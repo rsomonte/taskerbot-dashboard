@@ -16,7 +16,7 @@ export default async function Home() {
     );
   }
 
-  const objectives = getObjectives(session.user.id);
+  const objectives = await getObjectives(session.user.id);
 
   return (
     <main className="flex min-h-screen flex-col items-center p-8 sm:p-24">
