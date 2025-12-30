@@ -1,6 +1,6 @@
 # TaskerBot Dashboard
 
-A comprehensive dashboard for managing TaskerBot, featuring Discord authentication, objective tracking, proof submission, and dynamic bot settings. Built with Next.js 16, TypeScript, and Tailwind CSS.
+A comprehensive dashboard for managing [TaskerBot](https://github.com/rsomonte/taskerbot), featuring Discord authentication, objective tracking, proof submission, and dynamic bot settings. Built with Next.js 16, TypeScript, and Tailwind CSS.
 
 ## Features
 
