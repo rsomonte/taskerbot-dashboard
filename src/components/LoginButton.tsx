@@ -20,7 +20,7 @@ export default function LoginButton() {
   }
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-lg text-gray-300">Manage your TaskerBot configuration easily.</p>
+      <p className="text-lg text-gray-300">Manage your TaskerBot objectives easily.</p>
       <button 
         onClick={() => signIn("discord")} 
         className="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg shadow-lg"

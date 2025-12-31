@@ -99,7 +99,7 @@ export async function getObjectives(userId: string): Promise<Objective[]> {
     sql: 'SELECT * FROM objectives WHERE userId = ?',
     args: [userId]
   });
-  return result.rows as unknown as Objective[];
+  return result.rows.map((row) => ({ ...row })) as unknown as Objective[];
 }
 
 export async function createObjective(obj: Omit<Objective, 'lastSubmitted' | 'streak' | 'lastStreakDay' | 'lastReminded'>) {
@@ -109,7 +109,7 @@ export async function createObjective(obj: Omit<Objective, 'lastSubmitted' | 'st
       INSERT INTO objectives (userId, name, frequency, lastSubmitted, streak, lastStreakDay, lastReminded)
       VALUES (:userId, :name, :frequency, NULL, 0, NULL, NULL)
     `,
-    args: obj as any
+    args: obj as unknown as Record<string, string | number | null>
   });
 }
 
@@ -135,7 +135,8 @@ export async function getObjective(userId: string, name: string): Promise<Object
     sql: 'SELECT * FROM objectives WHERE userId = ? AND name = ?',
     args: [userId, name]
   });
-  return result.rows[0] as unknown as Objective | undefined;
+  const row = result.rows[0];
+  return row ? ({ ...row } as unknown as Objective) : undefined;
 }
 
 export async function updateObjective(obj: Objective) {
@@ -151,7 +152,7 @@ export async function updateObjective(obj: Objective) {
         lastStreakDay=excluded.lastStreakDay,
         lastReminded=excluded.lastReminded
     `,
-    args: obj as any
+    args: obj as unknown as Record<string, string | number | null>
   });
 }
 
@@ -160,18 +161,19 @@ export async function updateObjective(obj: Objective) {
 export async function getSettingDefinitions(): Promise<SettingDefinition[]> {
   await ensureInitialized();
   const result = await client.execute('SELECT * FROM setting_definitions');
-  return result.rows as unknown as SettingDefinition[];
+  return result.rows.map((row) => ({ ...row })) as unknown as SettingDefinition[];
 }
 
 export async function getUserSettings(userId: string): Promise<Record<string, string>> {
   await ensureInitialized();
   const result = await client.execute({
-    sql: 'SELECT key, value FROM user_settings WHERE userId = ?',
+    sql: 'SELECT "key", value FROM user_settings WHERE userId = ?',
     args: [userId]
   });
   const settings: Record<string, string> = {};
-  result.rows.forEach((row: any) => {
-    settings[row.key] = row.value;
+  result.rows.forEach((row) => {
+    const r = row as unknown as { key: string; value: string };
+    settings[r.key] = r.value;
   });
   return settings;
 }
@@ -180,9 +182,9 @@ export async function setUserSetting(userId: string, key: string, value: string)
   await ensureInitialized();
   await client.execute({
     sql: `
-      INSERT INTO user_settings (userId, key, value)
+      INSERT INTO user_settings (userId, "key", value)
       VALUES (?, ?, ?)
-      ON CONFLICT(userId, key) DO UPDATE SET value = excluded.value
+      ON CONFLICT(userId, "key") DO UPDATE SET value = excluded.value
     `,
     args: [userId, key, value]
   });

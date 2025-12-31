@@ -9,7 +9,7 @@ export default async function Home() {
 
   if (!session?.user) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <main className="flex flex-grow flex-col items-center justify-center p-24">
         <h1 className="text-4xl font-bold mb-8">TaskerBot Dashboard</h1>
         <LoginButton />
       </main>
@@ -19,7 +19,7 @@ export default async function Home() {
   const objectives = await getObjectives(session.user.id);
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-8 sm:p-24">
+    <main className="flex flex-grow flex-col items-center p-8 sm:p-24">
       <h1 className="text-4xl font-bold mb-8">Welcome back, {session.user.name}!</h1>
       <h2 className="mb-4 text-lg">Here are your objectives:</h2>
       <ObjectivesTable objectives={objectives} />

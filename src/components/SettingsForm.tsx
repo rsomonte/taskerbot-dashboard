@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { updateSetting } from "@/app/actions";
 import { SettingDefinition } from "@/lib/db";
 
@@ -12,6 +12,11 @@ interface SettingsFormProps {
 export default function SettingsForm({ definitions, userSettings }: SettingsFormProps) {
   const [settings, setSettings] = useState(userSettings);
   const [isPending, startTransition] = useTransition();
+
+  // Sync state with props when they change (e.g. after server revalidation)
+  useEffect(() => {
+    setSettings(userSettings);
+  }, [userSettings]);
 
   const handleChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
